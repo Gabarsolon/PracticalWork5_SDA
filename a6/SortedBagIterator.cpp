@@ -16,6 +16,7 @@ SortedBagIterator::SortedBagIterator(const SortedBag& b) : bag(b) {
 		current = stack[--stackIndex];
 	else
 		current = -1;
+	currentOccurence = 1;
 }
 
 TComp SortedBagIterator::getCurrent() {
@@ -31,16 +32,21 @@ bool SortedBagIterator::valid() {
 void SortedBagIterator::next() {
 	if (!valid())
 		throw std::exception();
-	int node = bag.right[current];
-	while (node != -1)
+	if (currentOccurence >= bag.elements[current].second)
 	{
-		stack[stackIndex++] = node;
-		node = bag.left[node];
+		int node = bag.right[current];
+		while (node != -1)
+		{
+			stack[stackIndex++] = node;
+			node = bag.left[node];
+		}
+		if (stackIndex != 0)
+			current = stack[--stackIndex];
+		else
+			current = -1;
+		currentOccurence = 0;
 	}
-	if (stackIndex != 0)
-		current = stack[--stackIndex];
-	else
-		current = -1;
+	currentOccurence++;
 }
 
 void SortedBagIterator::first() {
@@ -52,8 +58,9 @@ void SortedBagIterator::first() {
 		node = bag.left[node];
 	}
 	if (stackIndex != 0)
-		current = stack[stackIndex--];
+		current = stack[--stackIndex];
 	else
 		current = -1;
+	currentOccurence = 1;
 }
 

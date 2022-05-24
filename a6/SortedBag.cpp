@@ -138,7 +138,7 @@ bool SortedBag::remove(TComp e) {
 						right[replacementNode] = right[current];
 						left[replacementNode] = left[current];
 					}
-					freeP(current);
+					freeP(current); 
 				}
 				else
 				{

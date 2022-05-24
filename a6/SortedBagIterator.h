@@ -13,6 +13,7 @@ private:
 	int stack[1000];
 	int stackIndex;
 	int current;
+	int currentOccurence;
 
 public:
 	TComp getCurrent();
