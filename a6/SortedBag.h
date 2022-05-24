@@ -1,11 +1,15 @@
 #pragma once
 //DO NOT INCLUDE SORTEDBAGITERATOR
-
+#include <utility>
 //DO NOT CHANGE THIS PART
 typedef int TComp;
 typedef TComp TElem;
 typedef bool(*Relation)(TComp, TComp);
+typedef std::pair<TComp, int> TPair;
+
 #define NULL_TCOMP -11111;
+#define NULL_TPAIR pair<TComp, int>(-111111, -111111);
+
 
 class SortedBagIterator;
 
@@ -13,9 +17,18 @@ class SortedBag {
 	friend class SortedBagIterator;
 
 private:
-	//TODO - Representation
+	static const int capacity = 1000;
+	int nrOfElements;
+	int firstFree;
+	int root;
+	TPair elements[capacity];
+	int right[capacity];
+	int left[capacity];
+	Relation relation;
 
 public:
+	int allocateP();
+	void freeP(int i);
 	//constructor
 	SortedBag(Relation r);
 
