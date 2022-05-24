@@ -86,9 +86,69 @@ bool SortedBag::remove(TComp e) {
 	{
 		if (elements[current].first == e)
 		{
-			
+			if (current == root)
+			{
+				if (left[current] == -1 && right[current] == -1)
+				{
+					freeP(current);
+					root = -1;
+				}		
+				else if (left[current] != -1 && right[current] != -1)
+				{
+					int replacementNode = left[current];
+					while (right[replacementNode] != -1)
+						replacementNode = replacementNode[right];
+					if (replacementNode == left[current])
+					{
+						right[replacementNode] = right[current];
+						root = replacementNode;
+						freeP(current);
+					}
+					else
+					{
+						right[replacementNode] = right[current];
+						left[replacementNode] = left[current];
+						root = replacementNode;
+						freeP(current);
+					}
+				}
+				else
+				{
+					int rootToDelete = root;
+					if (right[current] != -1)
+						root = right[current];
+					else
+						root = left[current];
+					freeP(rootToDelete);
+				}
+			}
+			else
+			{
+				if (left[current] == -1 && right[current] == -1)
+					freeP(current);
+				else if (left[current] != -1 && right[current] != -1)
+				{
+					int replacementNode = left[current];
+					while (right[replacementNode] != -1)
+						replacementNode = replacementNode[right];
+					if (replacementNode == left[current])
+						right[replacementNode] = right[current];
+					else
+					{
+						right[replacementNode] = right[current];
+						left[replacementNode] = left[current];
+					}
+					freeP(current);
+				}
+				else
+				{
+					freeP(current);
+				}
+			}
+			nrOfElements--;
+			return true;
 		}
-		else if (relation(elem, elements[current].first))
+		else if (relation(e, elements[current].first))
 			current = left[current];
 		else
 			current = right[current];

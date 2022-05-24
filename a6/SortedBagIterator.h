@@ -10,8 +10,9 @@ class SortedBagIterator
 private:
 	const SortedBag& bag;
 	SortedBagIterator(const SortedBag& b);
-
-	//TODO - Representation
+	int stack[1000];
+	int stackIndex;
+	int current;
 
 public:
 	TComp getCurrent();
