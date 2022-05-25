@@ -125,11 +125,7 @@ bool SortedBag::remove(TComp e) {
 		if (elements[current].first == e)
 		{
 			if (elements[current].second > 1)
-			{
-
-
 				elements[current].second--;
-			}
 			else
 			{
 				if (current == root)
@@ -142,21 +138,26 @@ bool SortedBag::remove(TComp e) {
 					else if (left[current] != -1 && right[current] != -1)
 					{
 						int replacementNode = left[current];
+						int prevReplacementNode = -1;
 						while (right[replacementNode] != -1)
+						{
+							prevReplacementNode = replacementNode;
 							replacementNode = right[replacementNode];
+						}
+						if (prevReplacementNode != -1)
+							right[prevReplacementNode] = -1;
 						if (replacementNode == left[current])
 						{
 							right[replacementNode] = right[current];
 							root = replacementNode;
-							freeP(current);
 						}
 						else
 						{
 							right[replacementNode] = right[current];
 							left[replacementNode] = left[current];
 							root = replacementNode;
-							freeP(current);
 						}
+						freeP(current);
 					}
 					else
 					{
@@ -181,8 +182,14 @@ bool SortedBag::remove(TComp e) {
 					else if (left[current] != -1 && right[current] != -1)
 					{
 						int replacementNode = left[current];
+						int prevReplacementNode = -1;
 						while (right[replacementNode] != -1)
+						{
+							prevReplacementNode = replacementNode;
 							replacementNode = right[replacementNode];
+						}
+						if (prevReplacementNode != -1)
+							right[prevReplacementNode] = -1;
 						if (replacementNode == left[current])
 						{
 							right[replacementNode] = right[current];
@@ -223,7 +230,6 @@ bool SortedBag::remove(TComp e) {
 					}
 				}
 			}
-
 			nrOfElements--;
 			return true;
 		}
