@@ -17,14 +17,15 @@ class SortedBag {
 	friend class SortedBagIterator;
 
 private:
-	static const int capacity = 1000;
+	int capacity;
 	int nrOfElements;
 	int firstFree;
 	int root;
-	TPair elements[capacity];
-	int right[capacity];
-	int left[capacity];
+	TPair* elements;
+	int* right;
+	int* left;
 	Relation relation;
+	void resize();
 
 public:
 	int allocateP();

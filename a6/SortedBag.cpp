@@ -2,6 +2,37 @@
 #include "SortedBagIterator.h"
 #include <iostream>
 
+void SortedBag::resize()
+{
+	capacity *= 2;
+	int* newLeft = new int[capacity];
+	int* newRight = new int[capacity];
+	TPair* newElements = new TPair[capacity];
+	for (int i = 0; i < capacity / 2; i++)
+	{
+		newLeft[i] = left[i];
+		newRight[i] = right[i];
+		newElements[i] = elements[i];
+	}
+	for (int i = capacity / 2; i < capacity - 1; i++)
+	{
+		newLeft[i] = i + 1;
+		newRight[i] = i + 1;
+	}
+	newLeft[capacity - 1] = -1;
+	newRight[capacity - 1] = -1;
+
+	delete[] left;
+	delete[] right;
+	delete[] elements;
+
+	left = newLeft;
+	right = newRight;
+	elements = newElements;
+
+	firstFree = capacity/2;
+}
+
 int SortedBag::allocateP()
 {
 	if (firstFree == -1)
@@ -21,6 +52,10 @@ void SortedBag::freeP(int i)
 //Theta(1)
 
 SortedBag::SortedBag(Relation r) {
+	capacity = 32;
+	left = new int[capacity];
+	right = new int[capacity];
+	elements = new TPair[capacity];
 	relation = r;
 	nrOfElements = 0;
 	root = -1;
@@ -46,6 +81,8 @@ void SortedBag::add(TComp e) {
 	}
 	else
 	{
+		if (firstFree == -1)
+			resize();
 		int current = root;
 		int previous = -1;
 		while (current != -1)
@@ -82,76 +119,131 @@ void SortedBag::add(TComp e) {
 
 bool SortedBag::remove(TComp e) {
 	int current = root;
+	int prev = -1;
 	while (current != -1)
-	{
+	{	
 		if (elements[current].first == e)
 		{
-			if (current == root)
+			if (elements[current].second > 1)
 			{
-				if (left[current] == -1 && right[current] == -1)
+				if (elements[current].first == -99)
 				{
-					freeP(current);
-					root = -1;
-				}		
-				else if (left[current] != -1 && right[current] != -1)
-				{
-					int replacementNode = left[current];
-					while (right[replacementNode] != -1)
-						replacementNode = replacementNode[right];
-					if (replacementNode == left[current])
-					{
-						right[replacementNode] = right[current];
-						root = replacementNode;
-						freeP(current);
-					}
-					else
-					{
-						right[replacementNode] = right[current];
-						left[replacementNode] = left[current];
-						root = replacementNode;
-						freeP(current);
-					}
+					std::cout << elements[current].second << "\n";
+					for (int i = 0; i < 10; i++)
+						std::cout << elements[i].first << " " << left[i] << " " << right[i];
+					std::cout << '\n';
 				}
-				else
-				{
-					int rootToDelete = root;
-					if (right[current] != -1)
-						root = right[current];
-					else
-						root = left[current];
-					freeP(rootToDelete);
-				}
+					
+				elements[current].second--;
 			}
 			else
 			{
-				if (left[current] == -1 && right[current] == -1)
-					freeP(current);
-				else if (left[current] != -1 && right[current] != -1)
+				if (current == root)
 				{
-					int replacementNode = left[current];
-					while (right[replacementNode] != -1)
-						replacementNode = replacementNode[right];
-					if (replacementNode == left[current])
-						right[replacementNode] = right[current];
+					if (left[current] == -1 && right[current] == -1)
+					{
+						freeP(current);
+						root = -1;
+					}
+					else if (left[current] != -1 && right[current] != -1)
+					{
+						int replacementNode = left[current];
+						while (right[replacementNode] != -1)
+							replacementNode = right[replacementNode];
+						if (replacementNode == left[current])
+						{
+							right[replacementNode] = right[current];
+							root = replacementNode;
+							freeP(current);
+						}
+						else
+						{
+							right[replacementNode] = right[current];
+							left[replacementNode] = left[current];
+							root = replacementNode;
+							freeP(current);
+						}
+					}
 					else
 					{
-						right[replacementNode] = right[current];
-						left[replacementNode] = left[current];
+						int rootToDelete = root;
+						if (right[current] != -1)
+							root = right[current];
+						else
+							root = left[current];
+						freeP(rootToDelete);
 					}
-					freeP(current); 
 				}
 				else
 				{
-					freeP(current);
+					if (left[current] == -1 && right[current] == -1)
+					{
+						if (left[prev] == current)
+							left[prev] = -1;
+						else if (right[prev] == current)
+							right[prev] = -1;
+						freeP(current);
+					}
+					else if (left[current] != -1 && right[current] != -1)
+					{
+						int replacementNode = left[current];
+						while (right[replacementNode] != -1)
+							replacementNode = right[replacementNode];
+						if (replacementNode == left[current])
+						{
+							right[replacementNode] = right[current];
+							if (left[prev] == current)
+								left[prev] = replacementNode;
+							else
+								right[prev] = replacementNode;
+						}	
+						else
+						{
+							right[replacementNode] = right[current];
+							if (left[prev] == current)
+								left[prev] = replacementNode;
+							else
+								right[prev] = replacementNode;
+							left[replacementNode] = left[current];
+							
+						}
+						elements[current] = elements[replacementNode];
+						freeP(current);
+					}
+					else
+					{
+						if (left[prev] == current)
+						{
+							if (left[current] != -1)
+								left[prev] = left[current];
+							else
+								left[prev] = right[current];
+						}
+						else
+						{
+							if (left[current] != -1)
+								right[prev] = left[current];
+							else
+								right[prev] = right[current];
+						}
+						freeP(current);
+					}
 				}
 			}
+
 			nrOfElements--;
 			return true;
 		}
 		else if (relation(e, elements[current].first))
+		{
+			prev = current;
 			current = left[current];
+		}
 		else
+		{
+			prev = current;
 			current = right[current];
+		}
 	}
 	return false;
 }
@@ -204,5 +296,8 @@ SortedBagIterator SortedBag::iterator() const {
 
 
 SortedBag::~SortedBag() {
-	//TODO - Implementation
+	delete[] elements;
+	delete[] left;
+	delete[] right;
 }
+		
