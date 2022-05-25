@@ -117,146 +117,130 @@ void SortedBag::add(TComp e) {
 }
 
 
-bool SortedBag::remove(TComp e)
-{
-	if (nrOfElements == 0)
-		return false;
-	if (nrOfElements == 1 && elements[root].first == e)
+bool SortedBag::remove(TComp e) {
+	int current = root;
+	int prev = -1;
+	while (current != -1)
 	{
-		freeP(root);
-		root = -1;
-		nrOfElements--;
-		return true;
-	}
-	if (nrOfElements == 1 && elements[root].first != e)
-		return false;
+		if (elements[current].first == e)
+		{
+			if (elements[current].second > 1)
+			{
 
-	int currentPos = root;
-	int prevPos = -1;
-	while (currentPos != -1)
-	{
-		if (elements[currentPos].first == e)
-			break;
-		else if (relation(elements[currentPos].first, e) == true)
-		{
-			prevPos = currentPos;
-			currentPos = right[currentPos];
-		}
-		else if (relation(elements[currentPos].first, e) == false)
-		{
-			prevPos = currentPos;
-			currentPos = left[currentPos];
-		}
-	} //find if the key exists
-	if (currentPos == -1)
-		return false; //key does not exists
-	else //key exists
-	{
-		if (elements[currentPos].second > 1) //if there is more than 1 value
-		{
-			elements[currentPos].second--;
-			nrOfElements--;
-			return true;
-		}
-		else
-		{
-				if ((left[currentPos] == -1) && (right[currentPos] == -1)) //leaf
+
+				elements[current].second--;
+			}
+			else
+			{
+				if (current == root)
 				{
-					removeLeaf(currentPos, prevPos);
-					freeP(currentPos);
-					nrOfElements--;
-					return true;
-				}
-				if ((left[currentPos] == -1) || (right[currentPos] == -1)) //only 1 side descendants
-				{
-					removeNodeWithOneDescendant(currentPos, prevPos);
-					freeP(currentPos);
-					nrOfElements--;
-					return true;
-				}
-				if ((left[currentPos] != -1) && (right[currentPos] != -1))
-				{
-					int nodeToReplace = currentPos;
-					while (left[currentPos] != -1) //find the smallest node on the right subtree
+					if (left[current] == -1 && right[current] == -1)
 					{
-						prevPos = currentPos;
-						currentPos = left[currentPos];
+						freeP(current);
+						root = -1;
 					}
-					elements[nodeToReplace] = elements[currentPos];
-					if ((left[currentPos] == -1) && (right[currentPos] == -1)) //leaf
+					else if (left[current] != -1 && right[current] != -1)
 					{
-						removeLeaf(currentPos, prevPos);
-						freeP(currentPos);
-						nrOfElements--;
-						return true;
+						int replacementNode = left[current];
+						while (right[replacementNode] != -1)
+							replacementNode = right[replacementNode];
+						if (replacementNode == left[current])
+						{
+							right[replacementNode] = right[current];
+							root = replacementNode;
+							freeP(current);
+						}
+						else
+						{
+							right[replacementNode] = right[current];
+							left[replacementNode] = left[current];
+							root = replacementNode;
+							freeP(current);
+						}
 					}
 					else
 					{
-						removeNodeWithOneDescendant(currentPos, prevPos);
-						freeP(currentPos);
-						right[currentPos] = -1;
-						nrOfElements--;
-						return true;
+						int rootToDelete = root;
+						if (right[current] != -1)
+							root = right[current];
+						else
+							root = left[current];
+						freeP(rootToDelete);
 					}
-
 				}
+				else
+				{
+					if (left[current] == -1 && right[current] == -1)
+					{
+						if (left[prev] == current)
+							left[prev] = -1;
+						else if (right[prev] == current)
+							right[prev] = -1;
+						freeP(current);
+					}
+					else if (left[current] != -1 && right[current] != -1)
+					{
+						int replacementNode = left[current];
+						while (right[replacementNode] != -1)
+							replacementNode = right[replacementNode];
+						if (replacementNode == left[current])
+						{
+							right[replacementNode] = right[current];
+							if (left[prev] == current)
+								left[prev] = replacementNode;
+							else
+								right[prev] = replacementNode;
+						}
+						else
+						{
+							right[replacementNode] = right[current];
+							if (left[prev] == current)
+								left[prev] = replacementNode;
+							else
+								right[prev] = replacementNode;
+							left[replacementNode] = left[current];
+
+						}
+						freeP(current);
+					}
+					else
+					{
+						if (left[prev] == current)
+						{
+							if (left[current] != -1)
+								left[prev] = left[current];
+							else
+								left[prev] = right[current];
+						}
+						else
+						{
+							if (left[current] != -1)
+								right[prev] = left[current];
+							else
+								right[prev] = right[current];
+						}
+						freeP(current);
+					}
+				}
+			}
+
+			nrOfElements--;
+			return true;
+		}
+		else if (relation(e, elements[current].first))
+		{
+			prev = current;
+			current = left[current];
+		}
+		else
+		{
+			prev = current;
+			current = right[current];
 		}
 	}
-	//key does not exist
 	return false;
 }
 
-void SortedBag::removeLeaf(int leafPos, int parentPos) //lefts and rights of deleted node do not change
-{
-	if (left[parentPos] == leafPos) //leaf is left child
-	{
-		left[parentPos] = -1;
-	}
-	else
-	{
-		right[parentPos] = -1;
-	}
-}
-
-void SortedBag::removeNodeWithOneDescendant(int nodePos, int parentPos) //lefts and rights of deleted node do not change
-{
-	if (parentPos != -1)
-	{
-		if (left[parentPos] = nodePos) //node is left child
-		{
-			if (right[nodePos] == -1) //node has only left descendants
-			{
-				left[parentPos] = left[nodePos];
-			}
-			else if (left[nodePos] == -1) //node has only right descendants
-			{
-				left[parentPos] = right[nodePos];
-			}
-		}
-		else  //node is right child
-		{
-			if (right[nodePos] == -1) //node has only left descendants
-			{
-				right[parentPos] = left[nodePos];
-			}
-			else if (left[nodePos] == -1) //node has only right descendants
-			{
-				right[parentPos] = right[nodePos];
-			}
-		}
-	}
-	else //remove root
-	{
-		if (left[nodePos] == -1) //root has only right descendants
-		{
-			root = right[nodePos];
-		}
-		else if (right[nodePos] == -1) //root has only right descendants
-		{
-			root = left[nodePos];
-		}
-	}
-}
 
 bool SortedBag::search(TComp elem) const {
 	int current = root;

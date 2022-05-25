@@ -55,10 +55,6 @@ public:
 	//checks if the sorted bag is empty
 	bool isEmpty() const;
 
-	void removeLeaf(int leafPos, int parentPos);
-
-	void removeNodeWithOneDescendant(int nodePos, int parentPos);
-
 	//destructor
 	~SortedBag();
 };
