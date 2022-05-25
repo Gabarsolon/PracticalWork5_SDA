@@ -10,12 +10,13 @@ class SortedBagIterator
 private:
 	const SortedBag& bag;
 	SortedBagIterator(const SortedBag& b);
-	int stack[1000];
+	int* stack;
 	int stackIndex;
 	int current;
 	int currentOccurence;
 
 public:
+	~SortedBagIterator();
 	TComp getCurrent();
 	bool valid();
 	void next();

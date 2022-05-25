@@ -15,11 +15,7 @@ void SortedBag::resize()
 		newElements[i] = elements[i];
 	}
 	for (int i = capacity / 2; i < capacity - 1; i++)
-	{
-		newLeft[i] = i + 1;
 		newRight[i] = i + 1;
-	}
-	newLeft[capacity - 1] = -1;
 	newRight[capacity - 1] = -1;
 
 	delete[] left;
@@ -32,6 +28,7 @@ void SortedBag::resize()
 
 	firstFree = capacity/2;
 }
+//Theta(capacity)
 
 int SortedBag::allocateP()
 {
@@ -46,7 +43,6 @@ int SortedBag::allocateP()
 void SortedBag::freeP(int i)
 {
 	right[i] = firstFree;
-	left[i] = firstFree;
 	firstFree = i;
 }
 //Theta(1)
@@ -60,14 +56,11 @@ SortedBag::SortedBag(Relation r) {
 	nrOfElements = 0;
 	root = -1;
 	for (int i = 0; i < capacity - 1; i++)
-	{
 		right[i] = i + 1;
-		left[i] = i + 1;
-	}
-	left[capacity - 1] = -1;
 	right[capacity - 1] = -1;
 	firstFree = 0;
 }
+//Theta(capacity)
 
 void SortedBag::add(TComp e) {
 	if (root == -1)
@@ -115,6 +108,9 @@ void SortedBag::add(TComp e) {
 		nrOfElements++;
 	}
 }
+//Best case: Theta(1)
+//Worst case: Theta(height)
+//Total: O(height)
 
 
 bool SortedBag::remove(TComp e) {
@@ -246,7 +242,9 @@ bool SortedBag::remove(TComp e) {
 	}
 	return false;
 }
-
+//Best case: Theta(1)
+//Worst case: Theta(nrOfElements + height)
+//Total: O(nrOfElements + height)
 
 bool SortedBag::search(TComp elem) const {
 	int current = root;
@@ -261,6 +259,9 @@ bool SortedBag::search(TComp elem) const {
 	}
 	return false;
 }
+//Best case: Theta(1)
+//Worst case: Theta(height)
+//Total: O(height)
 
 
 int SortedBag::nrOccurrences(TComp elem) const {
@@ -276,22 +277,27 @@ int SortedBag::nrOccurrences(TComp elem) const {
 	}
 	return 0;
 }
-
+//Best case: Theta(1)
+//Worst case: Theta(height)
+//Total: O(height)
 
 
 int SortedBag::size() const {
 	return nrOfElements;
 }
+//Theta(1)
 
 
 bool SortedBag::isEmpty() const {
 	return nrOfElements == 0;
 }
+//Theta(1)
 
 
 SortedBagIterator SortedBag::iterator() const {
 	return SortedBagIterator(*this);
 }
+//Theta(1)
 
 
 SortedBag::~SortedBag() {
@@ -299,4 +305,5 @@ SortedBag::~SortedBag() {
 	delete[] left;
 	delete[] right;
 }
+//Theta(1)
 		
