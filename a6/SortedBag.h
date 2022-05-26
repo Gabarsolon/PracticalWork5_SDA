@@ -7,7 +7,7 @@ typedef TComp TElem;
 typedef bool(*Relation)(TComp, TComp);
 typedef std::pair<TComp, int> TPair;
 
-#define NULL_TCOMP -11111;
+#define NULL_TCOMP -11111
 #define NULL_TPAIR pair<TComp, int>(-111111, -111111);
 
 
@@ -57,4 +57,6 @@ public:
 
 	//destructor
 	~SortedBag();
+
+	TComp leastFrequent() const;
 };

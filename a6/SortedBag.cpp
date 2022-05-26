@@ -306,4 +306,36 @@ SortedBag::~SortedBag() {
 	delete[] right;
 }
 //Theta(1)
+
+TComp SortedBag::leastFrequent() const
+{
+	int current = root;
+	int minimumFrequency = INT_MAX;
+	TComp element = NULL_TCOMP;
+	int* stack = new int[capacity];
+	int stackIndex = 0;
+	while (current != -1)
+	{
+		stack[stackIndex++] = current;
+		current = left[current];
+	}
+	while (stackIndex > 0)
+	{
+		current = stack[--stackIndex];
+		if (elements[current].second < minimumFrequency)
+		{
+			minimumFrequency = elements[current].second;
+			element = elements[current].first;
+		}
+		current = right[current];
+		while (current != -1)
+		{
+			stack[stackIndex++] = current;
+			current = left[current];
+		}
+	}
+	delete[] stack;
+	return element;
+}
+//Theta(nrOfElements)
 		

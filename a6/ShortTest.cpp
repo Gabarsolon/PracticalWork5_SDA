@@ -36,5 +36,22 @@ void testAll() {
 	it.first();
 	assert(it.valid() == true);
 
+	SortedBag sb2(relation1);
+
+	assert(sb2.leastFrequent() == NULL_TCOMP);
+
+	sb2.add(5);
+	sb2.add(5);
+	sb2.add(5);
+
+	sb2.add(2);
+	sb2.add(2);
+
+	sb2.add(3);
+	sb2.add(3);
+	sb2.add(3);
+	sb2.add(3);
+	
+	assert(sb2.leastFrequent() == 2);
 }
 
